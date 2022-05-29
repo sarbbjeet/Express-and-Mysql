@@ -1,3 +1,7 @@
+/* access env config file(config() is empty because.env file is 
+present in the root directory)  */
+require("dotenv").config();
+
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
