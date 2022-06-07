@@ -1,15 +1,12 @@
-/* access env config file(config() is empty because.env file is 
-present in the root directory)  */
-require("dotenv").config();
-
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
 const app = require("express")();
+const { http_port, https_port } = require("../config/default");
 ///////////////////////////////
 //get port numbers
-const httpPort = process.env.HTTP_PORT || 3000;
-const httpsPort = process.env.HTTPS_PORT || 4000;
+const httpPort = http_port || 3000;
+const httpsPort = https_port || 4000;
 
 //add credentials for https server
 // const privateKey = fs

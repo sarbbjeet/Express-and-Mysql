@@ -21,9 +21,18 @@ const pool = mysql.createPool({
   connectionLimit: 10,
 });
 
+//just pass query to the db
+const dbWraper = (query) => {
+  return new Promise((resolve, reject) =>
+    pool.execute(query, function (err, result) {
+      if (err) return reject({ success: false, message: err.message });
+      return resolve(result);
+    })
+  );
+};
+
+module.exports = dbWraper;
 // con.connect((err) => {
 //   if (err) return console.error(err.message);
 //   console.log("connected with database");
 // });
-
-module.exports = pool;

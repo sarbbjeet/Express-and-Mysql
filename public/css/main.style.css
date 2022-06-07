@@ -1,0 +1,12 @@
+.container {
+  display: flex;
+  margin: 0;
+  box-sizing: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: teal;
+}
+.headerTags {
+  margin-left: 20px;
+  margin-right: 20px;
+}
