@@ -7,8 +7,8 @@ const User = require("../../models/User");
 const _ = require("lodash");
 const sendVerificationMail = require("../../mail/verificationMail");
 const verificationMail = require("../../mail/verificationMail");
+const auth = require("../../middleware/auth");
 //middleware
-
 const loginRequest = async ({ email, password }) => {
   const response = await axios.post(`${global.__baseURL}/login`, {
     email,
@@ -17,16 +17,15 @@ const loginRequest = async ({ email, password }) => {
   return await response.data;
 };
 router.use((req, res, next) => {
-  console.log(`url = ${req.url}`);
+  // console.log(`url = ${req.url}`);
   next();
 });
-//routers
-// router.get("/", (req, res) => {
-//   db.execute(`Select * from users where id =${2}`, (err, result) => {
-//     if (err) return res.json({ success: false, message: err.message });
-//     return res.json({ success: true, data: result });
-//   });
-// });
+
+/* email verify route */
+router.get("/email/verify", auth, (req, res) => {
+  res.render("templates/auth/resendVerifyEmail.handlebars");
+});
+
 //add user
 router.post("/", async (req, res) => {
   try {

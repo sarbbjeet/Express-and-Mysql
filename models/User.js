@@ -3,6 +3,7 @@ const dbWraper = require("../database/db");
 const _ = require("lodash");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const UserToken = require("./UserToken");
 const crypto = require("crypto"); //generate random string
 
 const createUserTb = `create table users(
@@ -15,11 +16,6 @@ const createUserTb = `create table users(
    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
    )`;
 
-const createUserTokenTb = ` create table user_tokens(
-   id int not null auto_increment primary key,
-   userId int not null,
-   token varchar(255) default null
-)`;
 //add remberToken column
 const addTokenToUserTable = `Alter table users add column rememberToken varchar(255) default null`;
 
@@ -49,10 +45,6 @@ class User {
       this.updated_at = updated_at;
     }
   }
-  //create user tokens manage table
-  createUserTokenTable = async () => {
-    await dbWraper(createUserTokenTb);
-  };
 
   alterUserTable = async () => {
     await dbWraper(addTokenToUserTable);
@@ -154,6 +146,14 @@ class User {
     const deleteUser = `DELETE FROM users WHERE email='${this.email}'`;
     await dbWraper(query);
     await this.refreshUser(await User.findByEmail(this.email));
+  };
+
+  //validate token and get user
+  static tokenValidate = async (token) => {
+    //token table  -->get user id
+    const userId = await UserToken.getUserIdByToken(token);
+    if (userId.length > 0) return await User.findById(userId[0].userId);
+    return Promise.reject(new Error("token is not valid"));
   };
 
   //email and password credientials check
