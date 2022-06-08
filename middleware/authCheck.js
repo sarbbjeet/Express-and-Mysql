@@ -5,13 +5,12 @@ module.exports = async (req, res, next) => {
     //firstly try to get token from cookies and then in the header
     const token = req.cookies["x-auth-token"] || req.header("x-auth-token");
     if (token) {
-      const user = await User.tokenValidate(token);
-      //delete user.password;
-      req.user = user;
+      req.user = await User.tokenValidate(token);
       return next();
     }
-  } catch (err) {}
-
+  } catch (err) {
+    // console.log(err.message);
+  }
   res.clearCookie("x-auth-token", { path: "/" }); //remove cookies
   return next();
 };

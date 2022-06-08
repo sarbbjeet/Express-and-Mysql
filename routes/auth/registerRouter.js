@@ -67,13 +67,12 @@ router.post("/", async (req, res) => {
     const hashPassword = await bcrypt.hash(password, salt);
     user.password = hashPassword;
     user.isVerified = isVerified;
+    await user.generateToken(); //->generateToken
     await user.save(); // -->user is created here
     //login request
-    const { rememberToken } = await loginRequest({ email, password });
     //res.header("x-auth-token", rememberToken);
-    return res
-      .cookie("x-auth-token", rememberToken) //store token in cookies
-      .redirect("/register/email/verify");
+    res.cookie("x-auth-token", user.rememberToken); //store token in cookies
+    return res.redirect("/register/email/verify");
     //return res.json(_.omit(user, ["password"])); //only password is not send back
   } catch (err) {
     return res.render("templates/auth/register.handlebars", {

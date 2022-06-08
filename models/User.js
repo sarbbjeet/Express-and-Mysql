@@ -106,7 +106,10 @@ class User {
   static findByEmail = async (email) => {
     const query = `SELECT * FROM users WHERE email='${email}' limit 1`;
     const users = await dbWraper(query);
-    return new User(users[0]);
+    if (users.length > 0) {
+      return new User(users[0]);
+    }
+    throw new Error(`user not found`);
   };
 
   //find by any properties of user
@@ -120,7 +123,10 @@ class User {
   static findById = async (id) => {
     const query = `SELECT * FROM users WHERE id='${id}' limit 1`;
     const users = await dbWraper(query);
-    return new User(users[0]);
+    if (users.length > 0) {
+      return new User(users[0]);
+    }
+    throw new Error(`user not found`);
   };
 
   save = async () => {
@@ -128,7 +134,7 @@ class User {
     //else --> insert new user
     const query = this.id
       ? `UPDATE users SET name = '${this.name}', email = '${this.email}', password = '${this.password}', isVerified = '${this.isVerified}', rememberToken = '${this.rememberToken}' WHERE id = '${this.id}'`
-      : `INSERT INTO users(name, email, password) VALUES ( '${this.name}','${this.email}','${this.password}')`;
+      : `INSERT INTO users(name, email, password, rememberToken) VALUES ( '${this.name}','${this.email}','${this.password}','${this.rememberToken}')`;
 
     const deleteUser = `DELETE FROM users WHERE email='${this.email}'`;
     await dbWraper(query);
@@ -151,9 +157,9 @@ class User {
   //validate token and get user
   static tokenValidate = async (token) => {
     //token table  -->get user id
-    const { id } = await jwt.verify(token, jwt_key); //get userId
+    const { email } = await jwt.verify(token, jwt_key); //get userId
     //const userId = await UserToken.getUserIdByToken(token);
-    return await User.findById(id);
+    return await User.findByEmail(email);
     //return Promise.reject(new Error("token is not valid"));
   };
 
