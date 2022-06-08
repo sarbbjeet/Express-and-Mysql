@@ -8,6 +8,7 @@ const _ = require("lodash");
 const sendVerificationMail = require("../../mail/verificationMail");
 const verificationMail = require("../../mail/verificationMail");
 const auth = require("../../middleware/auth");
+const verify = require("../../middleware/verify");
 //middleware
 const loginRequest = async ({ email, password }) => {
   const response = await axios.post(`${global.__baseURL}/login`, {
@@ -22,7 +23,7 @@ router.use((req, res, next) => {
 });
 
 /* email verify route */
-router.get("/email/verify", auth, (req, res) => {
+router.get("/email/verify", [auth, verify], (req, res) => {
   res.render("templates/auth/resendVerifyEmail.handlebars");
 });
 
