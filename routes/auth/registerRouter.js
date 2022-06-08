@@ -5,10 +5,11 @@ const Joi = require("joi");
 const db = require("../../database/db"); //create db connection
 const User = require("../../models/User");
 const _ = require("lodash");
-const sendVerificationMail = require("../../mail/verificationMail");
-const verificationMail = require("../../mail/verificationMail");
-const auth = require("../../middleware/auth");
-const verify = require("../../middleware/verify");
+const {
+  auth,
+  verify,
+  authCheck,
+} = require("../../middleware/middleware.index");
 //middleware
 const loginRequest = async ({ email, password }) => {
   const response = await axios.post(`${global.__baseURL}/login`, {
@@ -19,12 +20,37 @@ const loginRequest = async ({ email, password }) => {
 };
 router.use((req, res, next) => {
   // console.log(`url = ${req.url}`);
-  next();
+  return next();
+});
+/* email verify route */
+router.get("/email/verify", auth, async (req, res) => {
+  try {
+    const user = req.user;
+    const { code } = req.query; //check for query
+    if (code && user) {
+      //user sent a request with verification code
+      //-->check code validation
+      if (await user.validateVerificationCode(code))
+        return res.render("templates/email/emailVerificationSuccess");
+      return res.render("templates/email/emailVerificationFailed");
+    }
+    await user.generateEmailVerificationCode();
+    return res.render("templates/auth/resendVerifyEmail", {
+      success: true,
+      message: "Successfully sent verification email",
+    });
+  } catch (err) {
+    return res.render("templates/auth/resendVerifyEmail", {
+      error: true,
+      message: err.message,
+    });
+  }
 });
 
-/* email verify route */
-router.get("/email/verify", [auth, verify], (req, res) => {
-  res.render("templates/auth/resendVerifyEmail.handlebars");
+//register form
+router.get("/", authCheck, async (req, res) => {
+  if (!req.user) return res.render("templates/auth/register");
+  return res.redirect("/"); //already login user
 });
 
 //add user
@@ -42,16 +68,23 @@ router.post("/", async (req, res) => {
     user.password = hashPassword;
     user.isVerified = isVerified;
     await user.save(); // -->user is created here
-    //generate token and send email to the user
-    await user.generateEmailVerificationToken();
-    //login   ......
-
-    //return res.json(await loginRequest({ email, password }));
-
-    //return res.redirect(`${global.__baseURL}/home`);
-    return res.json(_.omit(user, ["password"])); //only password is not send back
+    //login request
+    const { rememberToken } = await loginRequest({ email, password });
+    //res.header("x-auth-token", rememberToken);
+    return res
+      .cookie("x-auth-token", rememberToken) //store token in cookies
+      .redirect("/register/email/verify");
+    //return res.json(_.omit(user, ["password"])); //only password is not send back
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    return res.render("templates/auth/register.handlebars", {
+      error: true,
+      message: err.message,
+      old: {
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+      },
+    });
   }
 });
 const validate = async (data) => {

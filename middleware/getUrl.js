@@ -2,10 +2,8 @@
 get server url address 
 */
 const url = require("url");
-const config = require("../config/default");
-
 const getUrl = (req, res, next) => {
-  //store host url in config
+  //store url in global variable
   global.__baseURL = url.format({
     protocol: req.protocol,
     host: req.get("host"),

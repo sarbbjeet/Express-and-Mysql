@@ -1,0 +1,41 @@
+<div style="display: flex; justify-content: center;">
+  <div style="margin-top: 100px; width: 300px;">
+
+    <div style="margin-bottom: 30px;">
+      <h2>Login to your account</h2>
+    </div>
+
+    {{> frontend/error}}
+    {{!-- {{> frontend/success }} --}}
+
+    <form
+      style="display: flex; flex-direction: column; width: 100%;"
+      action="/login"
+      method="post"
+    >
+      <input
+        style="letter-spacing:1px; margin-bottom: 15px;  padding:10px; border:1px solid #ccc; border-radius:5px;"
+        type="text"
+        placeholder="Email"
+        name="email"
+        id="email"
+        value="{{old.email}}"
+      />
+      <input
+        style="letter-spacing:1px; margin-bottom: 20px; padding:10px; border:1px solid #ccc; border-radius:5px;"
+        placeholder="Password"
+        type="password"
+        name="password"
+        id="password"
+        value="{{old.password}}"
+      />
+      <button
+        style="letter-spacing:1px; padding:15px 0; border:none;font-size:16px; color: #fff; background-color: #3163ec; border-radius:5px;"
+        type="submit"
+      >Login</button>
+
+      <p><a href="/register" style="color: #4751e9;">Create a new account</a></p>
+    </form>
+  </div>
+
+</div>

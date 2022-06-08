@@ -3,9 +3,7 @@ const dbWraper = require("../database/db");
 const _ = require("lodash");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const UserToken = require("./UserToken");
-const crypto = require("crypto"); //generate random string
-
+const EmailVerificationCode = require("../models/EmailVerificationCode");
 const createUserTb = `create table users(
    id int not null auto_increment primary key,
    name varchar(255) not null,
@@ -84,20 +82,8 @@ class User {
     await dbWraper(query);
   };
 
-  //create table contain email verification codes
-  emailVerificationTb = async () => {
-    const query = `Create table email_verification(
-         id int not null auto_increment primary key,
-         userId int not null,
-         code varchar(255) not null  
-      )`;
-    await dbWraper(query);
-  };
-  generateEmailVerificationToken = async () => {
-    const randomCode = crypto.randomBytes(16).toString("hex");
-    const query = `INSERT INTO email_verification(userId, code) VALUES (
-         '${this.id}', '${randomCode}')`;
-    await dbWraper(query);
+  generateEmailVerificationCode = async () => {
+    const randomCode = await EmailVerificationCode.generateCode(this.id);
     await verificationMail({ email: this.email, name: this.name }, randomCode); //send mail
   };
   generateToken = async () => {
@@ -106,12 +92,13 @@ class User {
     //generate token
     this.rememberToken = await jwt.sign(
       { id: this.id, email: this.email, created_at: new Date() },
-      jwt_key
+      jwt_key,
+      { expiresIn: "30 days" }
     );
     //insert token to user tokens table
-    const query = `INSERT INTO user_tokens(userId, token) VALUES(
-      '${this.id}', '${this.rememberToken}')`;
-    await dbWraper(query);
+    // const query = `INSERT INTO user_tokens(userId, token) VALUES(
+    //   '${this.id}', '${this.rememberToken}')`;
+    // await dbWraper(query);
   };
 
   //static method is only accessed by class name
@@ -148,12 +135,26 @@ class User {
     await this.refreshUser(await User.findByEmail(this.email));
   };
 
+  validateVerificationCode = async (code) => {
+    //get code
+    const match = await EmailVerificationCode.validateCode({
+      code,
+      userId: this.id,
+    });
+    if (match) {
+      //update to isVerified --> true
+      this.isVerified = 1; //
+      await this.save();
+    }
+    return match;
+  };
   //validate token and get user
   static tokenValidate = async (token) => {
     //token table  -->get user id
-    const userId = await UserToken.getUserIdByToken(token);
-    if (userId.length > 0) return await User.findById(userId[0].userId);
-    return Promise.reject(new Error("token is not valid"));
+    const { id } = await jwt.verify(token, jwt_key); //get userId
+    //const userId = await UserToken.getUserIdByToken(token);
+    return await User.findById(id);
+    //return Promise.reject(new Error("token is not valid"));
   };
 
   //email and password credientials check

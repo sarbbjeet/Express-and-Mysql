@@ -4,10 +4,17 @@ const router = require("express").Router();
 //validation
 const Joi = require("joi");
 // Joi.objectId = require("joi-objectid")(Joi);
+const { authCheck } = require("../../middleware/middleware.index");
+
 //middleware
 router.use((req, res, next) => {
-  // console.log(`middleware`);
   next();
+});
+
+//create login form
+router.get("/", authCheck, (req, res) => {
+  if (!req.user) return res.render("templates/auth/login");
+  return res.redirect("/"); //already login user
 });
 router.post("/", async (req, res) => {
   try {
@@ -19,9 +26,17 @@ router.post("/", async (req, res) => {
     // add token to user token table with user id
     await user.generateToken();
     await user.save();
-    res.json(_.omit(user, "password"));
+    res.cookie("x-auth-token", user.rememberToken).redirect("/");
+    // res.json(_.omit(user, "password"));
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.render("templates/auth/login.handlebars", {
+      error: true,
+      old: {
+        email: req.body.email,
+        password: req.body.password,
+      },
+      message: err.message,
+    });
   }
 });
 
