@@ -82,8 +82,11 @@ class User {
     await dbWraper(query);
   };
 
-  generateEmailVerificationCode = async () => {
-    const randomCode = await EmailVerificationCode.generateCode(this.id);
+  generateEmailVerificationCode = async ({ expiresIn }) => {
+    const randomCode = await EmailVerificationCode.generateCode(
+      this.id,
+      expiresIn
+    );
     await verificationMail({ email: this.email, name: this.name }, randomCode); //send mail
   };
   generateToken = async () => {

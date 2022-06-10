@@ -10,6 +10,7 @@ const {
   verify,
   authCheck,
 } = require("../../middleware/middleware.index");
+const EmailVerificationCode = require("../../models/EmailVerificationCode");
 //middleware
 const loginRequest = async ({ email, password }) => {
   const response = await axios.post(`${global.__baseURL}/login`, {
@@ -27,14 +28,14 @@ router.get("/email/verify", auth, async (req, res) => {
   try {
     const user = req.user;
     const { code } = req.query; //check for query
+    if (user.isVerified) return res.redirect("/");
     if (code && user) {
-      //user sent a request with verification code
-      //-->check code validation
+      //user sent a request with verification code //-->check code validation
       if (await user.validateVerificationCode(code))
         return res.render("templates/email/emailVerificationSuccess");
       return res.render("templates/email/emailVerificationFailed");
     }
-    await user.generateEmailVerificationCode();
+    await user.generateEmailVerificationCode({ expiresIn: "10min" });
     return res.render("templates/auth/resendVerifyEmail", {
       success: true,
       message: "Successfully sent verification email",
@@ -67,6 +68,7 @@ router.post("/", async (req, res) => {
     const hashPassword = await bcrypt.hash(password, salt);
     user.password = hashPassword;
     user.isVerified = isVerified;
+
     await user.generateToken(); //->generateToken
     await user.save(); // -->user is created here
     //login request
