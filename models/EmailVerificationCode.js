@@ -52,7 +52,7 @@ module.exports = class EmailVerificationCode {
     if (expiresIn.endsWith("h") || expiresIn.endsWith("hours")) {
       expiresTimeInMin =
         Number(expiresIn.split("h")[0] || expiresIn.split("hours")[0]) * 60; //convert hour into minutes
-      // const date = new Date(created_at);
+      //const date = new Date(created_at);
       // console.log("created_at =", Math.round(date.valueOf() / 60000)); //total minutes
       // console.log("current_at =", Math.round(Date.now().valueOf() / 60000));
       // console.log(moment().diff(created_at, "minutes"));

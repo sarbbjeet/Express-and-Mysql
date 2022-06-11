@@ -1,7 +1,9 @@
 const createTables = require("../database/createTables");
 const { registerRouter, loginRouter } = require("./auth/auth.index");
+const home = require("./home");
 const EmailVerificationCode = require("../models/EmailVerificationCode");
 module.exports = (app) => {
+  app.use("/home", home);
   app.use("/login", loginRouter);
   app.use("/register", registerRouter);
   app.use("/code", async (req, res) => {
@@ -25,8 +27,5 @@ module.exports = (app) => {
       if (!success) res.status(404).send({ error: message });
       return res.status(200).send(message);
     });
-  });
-  app.use("/", (req, res) => {
-    res.render("templates/home");
   });
 };

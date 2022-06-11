@@ -1,0 +1,21 @@
+<div class="header_container">
+  <div class="nav">
+    {{#if user}}
+      <div class="item"><a
+          href="{{navTags.0.route}}"
+        >{{navTags.0.title}}</a></div>
+      <div class="item"><a
+          href="{{navTags.1.route}}"
+        >{{navTags.1.title}}</a></div>
+      <div class="item"><a
+          href="{{navTags.2.route}}"
+        >{{navTags.2.title}}</a></div>
+      <div class="item"><a href="{{this.route}}">{{this.title}}</a></div>
+      <div class="item"><a href="{{this.route}}">{{this.title}}</a></div>
+    {{else}}
+      {{#each navTags}}
+        <div class="item"><a href="{{this.route}}">{{this.title}}</a></div>
+      {{/each}}
+    {{/if}}
+  </div>
+</div>

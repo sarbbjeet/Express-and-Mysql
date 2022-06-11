@@ -5,6 +5,7 @@ const Joi = require("joi");
 const db = require("../../database/db"); //create db connection
 const User = require("../../models/User");
 const _ = require("lodash");
+const navTags = require("../../views/partials/header/navTags");
 const {
   auth,
   verify,
@@ -32,26 +33,42 @@ router.get("/email/verify", auth, async (req, res) => {
     if (code && user) {
       //user sent a request with verification code //-->check code validation
       if (await user.validateVerificationCode(code))
-        return res.render("templates/email/emailVerificationSuccess");
-      return res.render("templates/email/emailVerificationFailed");
+        return res.render("templates/email/emailVerificationSuccess", {
+          cssFile: "css/register.css",
+          navTags: navTags(),
+        });
+      return res.render("templates/email/emailVerificationFailed", {
+        cssFile: "css/register.css",
+        navTags: navTags(),
+      });
     }
     await user.generateEmailVerificationCode({ expiresIn: "10min" });
     return res.render("templates/auth/resendVerifyEmail", {
       success: true,
       message: "Successfully sent verification email",
+      cssFile: "css/register.css",
+      navTags: navTags(),
+      user,
     });
   } catch (err) {
     return res.render("templates/auth/resendVerifyEmail", {
       error: true,
       message: err.message,
+      cssFile: "css/register.css",
+      navTags: navTags(),
+      user,
     });
   }
 });
 
 //register form
 router.get("/", authCheck, async (req, res) => {
-  if (!req.user) return res.render("templates/auth/register");
-  return res.redirect("/"); //already login user
+  if (!req.user)
+    return res.render("templates/auth/register", {
+      cssFile: "css/register.css",
+      navTags: navTags(),
+    });
+  return res.redirect("/home"); //already login user
 });
 
 //add user
@@ -74,7 +91,10 @@ router.post("/", async (req, res) => {
     //login request
     //res.header("x-auth-token", rememberToken);
     res.cookie("x-auth-token", user.rememberToken); //store token in cookies
-    return res.redirect("/register/email/verify");
+    return res.redirect("/register/email/verify", {
+      cssFile: "css/register.css",
+      navTags: navTags(),
+    });
     //return res.json(_.omit(user, ["password"])); //only password is not send back
   } catch (err) {
     return res.render("templates/auth/register.handlebars", {
@@ -85,6 +105,8 @@ router.post("/", async (req, res) => {
         email: req.body.email,
         password: req.body.password,
       },
+      cssFile: "css/register.css",
+      navTags: navTags(),
     });
   }
 });

@@ -87,7 +87,7 @@ class User {
       this.id,
       expiresIn
     );
-    await verificationMail({ email: this.email, name: this.name }, randomCode); //send mail
+    //await verificationMail({ email: this.email, name: this.name }, randomCode); //send mail
   };
   generateToken = async () => {
     if (!this.id && !this.email)

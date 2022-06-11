@@ -5,6 +5,7 @@ const router = require("express").Router();
 const Joi = require("joi");
 // Joi.objectId = require("joi-objectid")(Joi);
 const { authCheck } = require("../../middleware/middleware.index");
+const navTags = require("../../views/partials/header/navTags");
 
 //middleware
 router.use((req, res, next) => {
@@ -13,8 +14,12 @@ router.use((req, res, next) => {
 
 //create login form
 router.get("/", authCheck, (req, res) => {
-  if (!req.user) return res.render("templates/auth/login");
-  return res.redirect("/"); //already login user
+  if (!req.user)
+    return res.render("templates/auth/login", {
+      cssFile: "css/login.css",
+      navTags: navTags(),
+    });
+  return res.redirect("/home"); //already login user
 });
 router.post("/", async (req, res) => {
   try {
@@ -36,6 +41,8 @@ router.post("/", async (req, res) => {
         password: req.body.password,
       },
       message: err.message,
+      cssFile: "css/login.css",
+      navTags: navTags(),
     });
   }
 });
