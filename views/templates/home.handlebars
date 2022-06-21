@@ -1,6 +1,141 @@
 {{> header/navbar  }}
-<div class="home_container">
-  <div>
-    <h2>Home Page</h2>
+<div class="home_container container-fluid">
+  <div class="row justify-content-center mt-3">
+     <div class="col-md-8 col-sm-12">
+      <h2 class="w-100">Create a new account</h2>
+     </div>
+    </div>
+    <form class="row mt-3 justify-content-center was-validated" >
+      <div class="col-sm-6 col-md-4">
+          <input placeholder="name" class="form-control p-2 my-3" required />
+        <input type="email" placeholder="email" class="form-control p-2 my-3" required/>  
+         <input type="email" placeholder="confirm email" class="form-control p-2 mt-3" required/>
+     </div>
+      <div class="col-sm-6 col-md-4">
+         <input type="password" placeholder="password" class="form-control my-3 p-2" required/>
+         <input type="password" placeholder="confirm passowrd" class="form-control p-2 mt-3" required/>
+      </div>
+
+      <div class="row justify-content-center mt-3">
+      <div class="col-md-8 form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="myCheck" name="remember" required>
+        </div>
+          <div class="col-md-8 p-0">
+          <button type="submit" class="btn btn-primary p-2">Register</button>
+        </div>
+      </div>
+    </form>
+    
+   <form id="form1">
+    <div class="flex justify-center flex-col sm:flex-row">
+   <div class="basis-6/12 md:basis-4/12 px-2">
+   <input id="name" type="name" placeholder="name" class="form-input" required/>
+   
+   <div>  
+   <input id="email" type="email" placeholder="email" class="form-input" required/>
+    <div class="input-valid hidden text-green-400">Valid.</div>
+    <div class="input-invalid text-red-400">Please fill out this field.</div>
+   </div>
+   
+   <input id="email-confirm" type="email" placeholder="confirm email" class="form-input" required/>
+ 
+    </div>
+      <div class="basis-6/12 md:basis-4/12 px-2">
+      <input id="password" type="password" placeholder="password" class="form-input" required/>
+  
+      <input  id="password-confirm" type="password" placeholder="confirm password" class="form-input" required/>    
+      
+    </div>
   </div>
+  <div class="flex justify-center pt-2">
+    <div class="basis-full md:basis-8/12 px-2">
+    <button class="btn12 hover:bg-blue-700">Register</button>
+  </div>
+  </div>
+     {{!-- <button class="btn12 hover:bg-teal-400">Login</button> --}}
+  </form>
+
+
+
+{{!-- create grid system using tailwindcss --}}
+
+<div class="grid grid-cols-12 gap-2">
+<div class ="md:col-start-3 col-start-0 col-span-12 md:col-span-8"> 
+  <input type="text" placeholder="name" class="form-input">
 </div>
+<div class ="md:col-start-3 md:col-span-4 sm:col-span-6 col-span-12"> 
+  <input type="text" placeholder="email" class="form-input">
+</div>
+<div class ="md:col-span-4 sm:col-span-6 col-span-12"> 
+  <input type="text" placeholder="password" class="form-input">
+</div>
+
+<div class ="md:col-start-3 md:col-span-6 sm:col-span-8 col-span-12"> 
+  <input type="text" placeholder="message" class="form-input">
+</div>
+
+<div class ="md:col-span-2 col-start-0 col-span-4 "> 
+  <input type="text" placeholder="age" class="form-input">
+</div>
+<div class="md:col-start-3 col-start-0 col-span-12">
+  <button class="btn12 hover:bg-blue-700">Register</button>
+</div>
+
+</div>
+
+</div>
+
+    </div>
+  
+<script>
+
+
+
+const validateMess = ({target})=>{
+//target var contains element properties  
+const {type, id, value} = target;  
+//validate logic 
+let siblings = []; //get siblings nodes
+if(target.nextElementSibling){
+  siblings.push(target.nextElementSibling)
+  siblings[0] && siblings.push(siblings[0].nextElementSibling) 
+} 
+if(type ==='email' && siblings.length>0){
+  const validElem = siblings.find(s=>s.classList[0]==='input-valid')
+  const invalidElem = siblings.find(s=>s.classList[0]==='input-invalid')
+  if(value.indexOf('@') !==-1){
+    //success message
+    //hide error div 
+    invalidElem.style.display = 'none'; 
+    //make border green  
+    target.style.border =  '1px solid rgb(0,200,0)'
+    //invalidElem.style.color = 'rgb(0,200,0)'; 
+    //invalidElem.innerText = 'valid input'
+    //target.style.border ='1px solid rgb(0,200,0)';  
+    }
+else{
+   invalidElem.style.display = 'block';  //make visable
+   //invalidElem.style.color = 'rgba(200,0,0,0.6)';  
+   invalidElem.innerText = "wrong email address"   //validate error 
+    target.style.border =  '1px solid rgba(200,0,0,0.6)'
+  }
+}
+}
+
+
+//document is ready  
+ document.addEventListener('DOMContentLoaded', function(){
+  const numberOfChilds = document.forms['form1'].length
+  if(numberOfChilds > 0)
+  for(let e=0; e<numberOfChilds; e++)
+     document.forms['form1'][e].addEventListener('input', validateMess)   
+  
+
+  navigator.geolocation.getCurrentPosition(({coords})=>{
+ const {latitude, longitude} = coords
+    console.log("latitude=", latitude)
+    console.log("longitude=", longitude)
+
+  })
+});
+</script>
