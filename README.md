@@ -1,5 +1,5 @@
 ## Express-and-Mysql
-This is custom login system with email verification and mysql database management. 
+This project covers how to integrate a MySQL database with Node.js and how to make a stunning user experience with CSS, Bootstrap, and Material UI.
 ## Skills  
 1. Email verification
 2. Token validation
