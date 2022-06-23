@@ -5,6 +5,7 @@ This is custom login system with email verification and mysql database managemen
 2. Token validation
 3. Using DOM Form UI validation 
 4. Mysql queries handling using custom Models
+5. Template rendering using handlebars 
 ## .env file 
 Rename .env.example file to .env file before running this project. 
 Email and database releated confirmation settings should be properly configured into .env file. 
